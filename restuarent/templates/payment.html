@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+
+<style>
+body{
+background:#f8f9fa;
+padding-bottom:160px;
+}
+</style>
+</head>
+
+<body>
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'index' %}">FoodieHub</a>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'index' %}">Home</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="">About</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="">Contact</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="">Locate Us</a>
+        </li>
+
+        {% if user.is_authenticated %}
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center"
+             href="#" role="button" data-bs-toggle="dropdown">
+
+            <div class="rounded-circle bg-success text-white d-flex justify-content-center align-items-center"
+                 style="width:40px;height:40px;font-weight:bold;">
+              {{ user.username|first|upper }}
+            </div>
+          </a>
+
+         <ul class="dropdown-menu dropdown-menu-end profile-dropdown shadow border-0">
+
+    <!-- User Info -->
+    <li class="px-3 py-2">
+        <div class="fw-semibold">{{ user.username }}</div>
+        <small class="text-muted">Welcome back 👋</small>
+    </li>
+
+    <li><hr class="dropdown-divider"></li>
+
+    <li>
+        <a class="dropdown-item d-flex align-items-center"
+           href="{% url 'profile_dashboard' %}">
+            <i class="fa fa-user me-2 text-success"></i>
+            Edit Profile
+        </a>
+    </li>
+
+    <!-- Logout -->
+    <li>
+        <a class="dropdown-item d-flex align-items-center text-danger"
+           href="{% url 'logout' %}">
+            <i class="fa fa-sign-out-alt me-2"></i>
+            Logout
+        </a>
+    </li>
+</ul>
+        </li>
+
+        {% else %}
+
+        <!-- Login Button -->
+        <li class="nav-item">
+          <a class="nav-link btn btn-primary text-white px-3"
+             href="{% url 'login' %}">
+            Login
+          </a>
+        </li>
+
+        {% endif %}
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<div class="container py-4">
+
+<!-- ORDER SUMMARY -->
+<div class="card shadow-lg border-0 rounded-4 mb-4">
+<div class="card-body">
+
+<h4 class="text-center mb-4">🧾 Order Summary</h4>
+
+{% for item in items %}
+
+<div class="d-flex justify-content-between mb-3 p-3 bg-light rounded">
+
+<div>
+<h6>{{ item.product.name }}</h6>
+<small>ID: {{ item.product.product_id }}</small><br>
+<small>₹{{ item.product.price }} × {{ item.quantity }}</small>
+</div>
+
+<div class="text-end">
+<b>₹{{ item.product.price }}</b><br>
+<span class="badge bg-success">Qty {{ item.quantity }}</span>
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+</div>
+
+
+<!-- PAYMENT METHOD -->
+<div class="card shadow-sm rounded-4 mb-4">
+<div class="card-body">
+
+<h5 class="fw-bold mb-3">💳 Payment Method</h5>
+
+<div class="form-check border rounded p-3 mb-3">
+  <input class="form-check-input" 
+         type="radio" 
+         id="cod" 
+         name="payment_method"
+         value="cod">
+
+  <label class="form-check-label w-100" for="cod">
+    Cash on Delivery
+  </label>
+</div>
+
+<div class="form-check border rounded p-3 mb-3">
+  <input class="form-check-input"
+         type="radio"
+         id="Onlinepayment"
+         name="payment_method"
+         value="online"
+         data-bs-toggle="collapse"
+         data-bs-target="#upiOptions">
+
+  <label class="form-check-label" for="Onlinepayment">
+    Online Payment
+  </label>
+</div>
+
+<div class="collapse ms-4" id="upiOptions">
+
+<div class="form-check">
+<input class="form-check-input" type="radio">
+<label class="form-check-label">
+<i class="fa-brands fa-google-pay text-primary"></i> Google Pay
+</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="radio">
+<label class="form-check-label">
+<i class="fa-solid fa-mobile"></i> PhonePe
+</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="radio">
+<label class="form-check-label">
+<i class="fa-solid fa-wallet"></i> Paytm
+</label>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+
+
+
+<!-- BOTTOM BAR -->
+<div class="bg-white border-top shadow-sm position-fixed bottom-0 start-0 w-100">
+
+<div class="container">
+
+<div class="d-flex justify-content-between align-items-start flex-wrap">
+
+<!-- ADDRESS SECTION -->
+<div class="p-3">
+
+<h6>Delivery Address</h6>
+
+{% if selected_address %}
+
+<p class="fw-semibold mb-1">{{ selected_address.full_name }}</p>
+<p class="text-muted small mb-1">Ph: {{ selected_address.phone }}</p>
+
+<p class="text-muted small mb-0">
+    {{ selected_address.address_line }},
+    {{ selected_address.street }},
+    {{ selected_address.city }},
+    {{ selected_address.landmark }},
+    {{ selected_address.zip_code }}
+</p>
+
+<!-- CHANGE ADDRESS -->
+<div class="dropdown mb-2">
+
+<button class="btn btn-outline-success btn-sm dropdown-toggle"
+type="button"
+data-bs-toggle="dropdown">
+
+Change Address
+
+</button>
+
+<ul class="dropdown-menu">
+
+<li>
+<a class="dropdown-item"
+data-bs-toggle="collapse"
+href="#homeAddress">
+🏠 Home
+</a>
+</li>
+
+<li>
+<a class="dropdown-item"
+data-bs-toggle="collapse"
+href="#officeAddress">
+🏢 Office
+</a>
+</li>
+
+<li>
+<a class="dropdown-item"
+data-bs-toggle="collapse"
+href="#otherAddress">
+📍 Other
+</a>
+</li>
+
+</ul>
+
+</div>
+
+<!-- HOME CARD -->
+<div class="collapse mb-2" id="homeAddress">
+
+<form method="POST" action="{% url 'update_address' %}">
+{% csrf_token %}
+
+<div class="card p-3 shadow-sm">
+
+<h6 class="fw-bold">Update Address</h6>
+<input type="hidden" name="address_type" value="home">
+<input type="number" name="phone" class="form-control mb-2"
+placeholder="phone number"
+value="{{ home_address.phone }}">
+
+<input type="text" name="address_line" class="form-control mb-2"
+placeholder="Address Line"
+value="{{ home_address.address_line }}">
+
+<input type="text" name="street" class="form-control mb-2"
+placeholder="Street"
+value="{{ home_address.street }}">
+
+<input type="text" name="city" class="form-control mb-2"
+placeholder="City"
+value="{{ home_address.city }}">
+
+<input type="text" name="landmark" class="form-control mb-2"
+placeholder="Landmark"
+value="{{ home_address.landmark }}">
+
+<input type="text" name="zip_code" class="form-control mb-2"
+placeholder="Zip Code"
+value="{{ home_address.zip_code }}">
+
+<button class="btn btn-success btn-sm">
+Update Address
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+
+<!-- OFFICE CARD -->
+<div class="collapse mb-2" id="officeAddress">
+
+<form method="POST" action="{% url 'update_address' %}">
+{% csrf_token %}
+
+<div class="card p-3 shadow-sm">
+
+<h6 class="fw-bold">Update Address</h6>
+<input type="hidden" name="address_type" value="office">
+<input type="number" name="phone" class="form-control mb-2"
+placeholder="phone number"
+value="{{ office_address.phone }}">
+
+<input type="text" name="address_line" class="form-control mb-2"
+placeholder="Address Line"
+value="{{ office_address.address_line }}">
+
+<input type="text" name="street" class="form-control mb-2"
+placeholder="Street"
+value="{{ office_address.street }}">
+
+<input type="text" name="city" class="form-control mb-2"
+placeholder="City"
+value="{{ office_address.city }}">
+
+<input type="text" name="landmark" class="form-control mb-2"
+placeholder="Landmark"
+value="{{ office_address.landmark }}">
+
+<input type="text" name="zip_code" class="form-control mb-2"
+placeholder="Zip Code"
+value="{{ office_address.zip_code }}">
+
+<button class="btn btn-success btn-sm">
+Update Address
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+
+<!-- OTHER CARD -->
+<div class="collapse mb-2" id="otherAddress">
+
+<form method="POST" action="{% url 'update_address' %}">
+{% csrf_token %}
+
+<div class="card p-3 shadow-sm">
+
+<h6 class="fw-bold">Update Address</h6>
+<input type="hidden" name="address_type" value="other">
+<input type="number" name="phone" class="form-control mb-2"
+placeholder="phone number"
+value="{{ other_address.phone }}">
+
+<input type="text" name="address_line" class="form-control mb-2"
+placeholder="Address Line"
+value="{{ other_address.address_line }}">
+
+<input type="text" name="street" class="form-control mb-2"
+placeholder="Street"
+value="{{ other_address.street }}">
+
+<input type="text" name="city" class="form-control mb-2"
+placeholder="City"
+value="{{ other_address.city }}">
+
+<input type="text" name="landmark" class="form-control mb-2"
+placeholder="Landmark"
+value="{{ other_address.landmark }}">
+
+<input type="text" name="zip_code" class="form-control mb-2"
+placeholder="Zip Code"
+value="{{ other_address.zip_code }}">
+
+<button class="btn btn-success btn-sm">
+Update Address
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+{% else %}
+
+<p class="text-danger">No address found</p>
+
+{% endif %}
+
+</div>
+
+
+<!-- TOTAL + ORDER BUTTON -->
+<div class="d-flex align-items-center gap-3 p-3">
+
+<div class="text-end">
+
+<small class="text-muted">TOTAL</small><br>
+<span class="fs-5 fw-bold text-success">₹{{ total }}</span>
+
+</div>
+
+<form method="POST" action="{% url 'place_order' %}">
+{% csrf_token %}
+
+<input type="hidden" name="total" value="{{ total }}">
+
+<button class="btn btn-success rounded-pill px-4">
+Place Order
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<!-- Order Success Modal --> 
+ <div class="modal fade" id="orderSuccessModal" tabindex="-1" data-bs-backdrop="static"> 
+  <div class="modal-dialog modal-dialog-centered"> 
+    <div class="modal-content rounded-4 shadow"> 
+    <div class="modal-body text-center p-4"> <i class="fa fa-check-circle text-success mb-3" style="font-size:60px;"></i> <h4 class="text-success">Order Placed Successfully!</h4> <p>Your Order ID:</p>
+       <h5 class="fw-bold text-dark">#{{ order.order_id }}</h5> 
+       <a href="{% url 'index' %}" class="btn btn-success mt-3 px-4 rounded-pill"> Continue Shopping </a>
+       </div>
+       </div>
+       </div>
+       </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+ {% if order %} 
+ <script> 
+ document.addEventListener("DOMContentLoaded", function () { var modalElement = document.getElementById("orderSuccessModal"); var orderModal = new bootstrap.Modal(modalElement); orderModal.show(); }); 
+</script> 
+{% endif %}
+
+</body>
+</html>
