@@ -43,11 +43,159 @@ border:none;
 border-radius:10px;
 }
 
+.header{
+background-image:url('https://img.freepik.com/premium-photo/mix-vegetables-food-isolated-grey-background_429553-176.jpg?w=2000');
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+color:black;
+}
+
+.admin-badge{
+background:#dc3545;
+padding:4px 10px;
+border-radius:20px;
+font-size:12px;
+margin-left:5px;
+}
+
+.admin-icon{
+width:40px;
+height:40px;
+border-radius:50%;
+background:#dc3545;
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+font-size:18px;
+}
+
+.food-section{
+border:1px solid #ddd;
+border-radius:10px;
+padding:25px;
+margin-top:40px;
+background:#fafafa;
+}
+
+
+ .icon {
+  width: 40px;   /* reduced */
+  height: 40px;  /* reduced */
+  border-radius: 50%;
+  position: relative;
+  
+  background: #e74c3c;
+  border: 3px solid white; /* slightly thinner */
+  box-shadow: inset 0 0 0 3px #c0392b;
+}
+
+.icon::after {
+  content: "";
+  width: 18px;   /* reduced */
+  height: 18px;  /* reduced */
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  background: radial-gradient(#2d3436 1.5px, transparent 1.5px);
+  background-size: 5px 5px;
+}
+
+
+.icon {
+  --size: 40px;
+  width: var(--size);
+  height: var(--size);
+}
+
+
+.F {
+  gap: 20px;
+    padding-left: 10px;
+
+}
+
 </style>
 
 </head>
 
 <body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<div class="container">
+      <div class="icon"></div>
+
+
+<a class="navbar-brand" href="#">
+FoodHub <span class="admin-badge">ADMIN</span>
+</a>
+
+<div class="collapse navbar-collapse">
+<ul class="navbar-nav ms-auto">
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'admin_dashboard' %}">Dashboard</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'product' %}">Products</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{% url 'order_detail' %}">Orders</a>
+
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'users' %}">Users</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link text-danger" href="{% url 'admin_logout' %}">
+Logout
+</a>
+</li>
+
+
+
+<li class="nav-item dropdown ms-3">
+
+<div class="admin-icon dropdown-toggle"
+     data-bs-toggle="dropdown"
+     style="cursor:pointer;">
+
+{{ request.session.admin_email|first|upper }}
+
+</div>
+
+<ul class="dropdown-menu dropdown-menu-end shadow">
+
+<li class="dropdown-item-text">
+Hi, Welcome 👋
+</li>
+
+<li>
+<hr class="dropdown-divider">
+</li>
+
+<li>
+<a class="dropdown-item" href="">
+<i class="fa fa-user"></i> Edit Profile
+</a>
+</li>
+
+
+</ul>
+
+</li>
+</ul>
+</div>
+
+</div>
+</nav>
 
 <!-- Sidebar -->
 

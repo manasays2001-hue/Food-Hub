@@ -47,6 +47,45 @@ margin-top:40px;
 background:#fafafa;
 }
 
+
+ .icon {
+  width: 40px;   /* reduced */
+  height: 40px;  /* reduced */
+  border-radius: 50%;
+  position: relative;
+  
+  background: #e74c3c;
+  border: 3px solid white; /* slightly thinner */
+  box-shadow: inset 0 0 0 3px #c0392b;
+}
+
+.icon::after {
+  content: "";
+  width: 18px;   /* reduced */
+  height: 18px;  /* reduced */
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  background: radial-gradient(#2d3436 1.5px, transparent 1.5px);
+  background-size: 5px 5px;
+}
+
+
+.icon {
+  --size: 40px;
+  width: var(--size);
+  height: var(--size);
+}
+
+
+.F {
+  gap: 20px;
+    padding-left: 10px;
+
+}
 </style>
 </head>
 
@@ -56,6 +95,8 @@ background:#fafafa;
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 <div class="container">
+      <div class="icon"></div>
+
 
 <a class="navbar-brand" href="#">
 FoodHub <span class="admin-badge">ADMIN</span>
@@ -72,7 +113,7 @@ FoodHub <span class="admin-badge">ADMIN</span>
 <a class="nav-link" href="{% url 'product' %}">Products</a>
 </li>
 <li class="nav-item">
-  <a class="nav-link" href="">Orders</a>
+  <a class="nav-link" href="{% url 'order_detail' %}">Orders</a>
 
 </li>
 

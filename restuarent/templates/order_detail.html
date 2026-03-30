@@ -1,30 +1,128 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style> 
+  .body{
+background:#f4f6f9;
+}
+
+.sidebar{
+height:100vh;
+background:#1f2d3d;
+color:white;
+padding-top:20px;
+position:fixed;
+width:230px;
+}
+
+.sidebar a{
+color:white;
+display:block;
+padding:12px 20px;
+text-decoration:none;
+}
+
+.sidebar a:hover{
+background:#495057;
+}
+
+.main{
+margin-left:230px;
+padding:20px;
+}
+
+.card{
+border:none;
+border-radius:10px;
+}
+
+</style>
 </head>
 <body>
-    <h2>Order Details</h2>
+  
+<div class="card mt-5 shadow">
 
-<p><strong>Order ID:</strong> {{ order.id }}</p>
-<p><strong>User:</strong> {{ order.user }}</p>
-<p><strong>Status:</strong> {{ order.status }}</p>
-<p><strong>Total:</strong> ₹{{ order.total }}</p>
+<div class="card-header">
+<h5>Recent Orders</h5>
+</div>
 
-<h4>Products:</h4>
+<div class="card-body">
+<form method="GET" class="row mb-3">
 
-<ul>
-{% for item in order.items.all %}
-    <li>{{ item.product.name }} (x{{ item.quantity }})</li>
+  <div class="col-md-3">
+    <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+  </div>
+
+  <div class="col-md-3">
+    <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+  </div>
+
+  <div class="col-md-3">
+    <button type="submit" class="btn btn-primary">
+      <i class="fa fa-filter"></i> Filter
+    </button>
+
+<a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Reset</a>  </div>
+
+</form>
+<table class="table">
+
+<thead>
+<tr>
+<th>Order ID</th>
+<th>User</th>
+<th>Product</th>
+<th>Price</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for order in orders %}
+
+<tr>
+<td>{{ order.id }}</td>
+<td>{{ order.user }}</td>
+
+<td>
+    {% for item in order.items.all %}
+        {{ item.product.name }}<br>
+    {% empty %}
+        No items
+    {% endfor %}
+</td>
+
+<td>₹{{ order.total }}</td>
+
+<td>
+{% if order.status == "Pending" %}
+    <span class="badge bg-warning text-dark">Pending</span>
+{% elif order.status == "Completed" %}
+    <span class="badge bg-success">Completed</span>
+{% else %}
+    <span class="badge bg-danger">{{ order.status }}</span>
+{% endif %}
+</td>
+
+</tr>
+
 {% endfor %}
-</ul>
 
-<footer class="bg-dark text-white text-center py-3 mt-5">
-  <small>
-    © 2026 FoodieHub | Made  using Bootstrap & Django
-  </small>
-</footer>
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
 </body>
 </html>

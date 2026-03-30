@@ -1,5 +1,4 @@
 import email
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
@@ -575,3 +574,7 @@ def users(request):
     return render(request, 'users.html', {
         'users': users
     })
+
+def order_detail(request):
+
+    return render(request, 'order_detail.html')

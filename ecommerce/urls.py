@@ -24,21 +24,15 @@ urlpatterns = [
     path('admin_login', views.admin_login, name='admin_login'),
     path('admin_home', views.admin_home , name='admin_home'),
     path('', views.index, name='index'),
-
     path('entry/', views.entry, name='entry'),
     path('product/', views.product, name='product'),
-
     path('edit/<int:product_id>/', views.edit, name='edit_product'),
     path('delete/<int:id>/', views.delete, name='delete'),
-
     path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
-
-   path('checkout/', views.checkout, name='checkout'),
+    path('checkout/', views.checkout, name='checkout'),
     path('payment/', views.payment_page, name='payment_page'),
-
     path('update_quantity/<int:cart_id>/', views.update_quantity, name='update_quantity'),
     path('remove/<int:id>/', views.remove_from_cart, name='remove_from_cart'),
-
     path('login/', views.login_view, name='login'),
     path('register/', views.register, name='register'),
     path('logout/', views.logout_view, name='logout'),
@@ -55,5 +49,6 @@ urlpatterns = [
     path('order_dashboard', views.order_dashboard, name='order_dashboard'),
     path('order/<int:id>/', views.order_detail, name='order_detail'),
     path('users', views.users, name='users'),
+    path('order_detail', views.order_detail, name='order_detail'),
 
 ]
