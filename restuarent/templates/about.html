@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About Me</title>
+
+  <!-- Bootstrap -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #ffffff;
+    }
+
+    .about-section {
+      padding: 80px 100px;
+      background-color: #f8f9fa;
+      min-height: 100vh;
+    }
+
+    .profile-img {
+      width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .about-title {
+      font-weight: 700;
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #555;
+    }
+
+    .skill-box {
+      background: white;
+      padding: 12px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+    }
+
+    .btn-custom {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container-fluid about-section">
+  <div class="row align-items-center">
+
+    <!-- LEFT IMAGE -->
+    <div class="col-md-5">
+      <img src="{% static 'C:\ecommerce\ecommerce\restuarent\static\img' %}" class="profile-img" alt="My Image">
+    </div>
+
+    <!-- RIGHT CONTENT -->
+    <div class="col-md-7">
+      <h2 class="about-title">About Me</h2>
+
+      <p>
+        Hi, I'm <strong>Manasa Srikanth</strong>, a passionate Python Full Stack Developer.
+        I enjoy building web applications and continuously learning new technologies.
+      </p>
+
+      <p>
+        I currently work in Revenue Cycle Management while developing my skills in
+        Django, frontend technologies, and real-time projects.
+      </p>
+
+      <!-- SKILLS -->
+      <h4 class="mt-4">Skills</h4>
+
+      <div class="skill-box">HTML & CSS</div>
+      <div class="skill-box">Bootstrap</div>
+      <div class="skill-box">Python</div>
+      <div class="skill-box">Django</div>
+
+      <!-- BUTTONS -->
+      <div class="mt-4">
+        <a href="https://github.com/your-username" target="_blank" class="btn btn-dark btn-custom">
+          GitHub
+        </a>
+
+        <a href="mailto:manasays2001@gmail.com" class="btn btn-primary btn-custom">
+          Contact Me
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+</body>
+</html>

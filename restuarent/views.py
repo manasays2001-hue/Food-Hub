@@ -578,3 +578,6 @@ def users(request):
 def order_detail(request):
 
     return render(request, 'order_detail.html')
+
+def about(request):
+    return render(request, "about.html")
