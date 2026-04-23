@@ -1,12 +1,12 @@
 import email
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from .models import Entry,Address,Order,OrderItem,admin
 from django.db.models import Sum,FloatField
 import uuid,random,string
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 
 def entry(request):
 
@@ -206,12 +206,13 @@ def edit_address(request, id):
 
 def register(request):
     if request.method == "POST":
-
         full_name = request.POST.get("full_name")
         email = request.POST.get("email")
         phone = request.POST.get("phone")
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
+        address_type = request.POST.get("address_type", "home")  # ✅ add this
+
         if password != confirm_password:
             messages.error(request, "Passwords do not match")
             return redirect("register")
@@ -219,13 +220,12 @@ def register(request):
         if Address.objects.filter(email=email).exists():
             messages.error(request, "User already exists")
             return redirect("login")
-        
+
         user = User.objects.create_user(
             username=email,
             email=email,
             password=password
-           )
-
+        )
 
         Address.objects.create(
             user=user,
@@ -233,6 +233,7 @@ def register(request):
             password=password,
             full_name=full_name,
             phone=phone,
+            address_type=address_type,   # ✅ save it here
             address_line=request.POST.get("address_line"),
             street=request.POST.get("street"),
             city=request.POST.get("city"),
@@ -296,21 +297,22 @@ def payment_page(request):
     items = []
     total = 0
 
-
     for product_id, quantity in cart.items():
         product = Entry.objects.get(product_id=int(product_id))
         subtotal = product.price * quantity
         total += subtotal
-
         items.append({
             'product': product,
             'quantity': quantity,
             'subtotal': subtotal
         })
-    
-        home_address = Address.objects.filter(user=request.user, address_type="home").first()
-        office_address = Address.objects.filter(user=request.user, address_type="office").first()
-        other_address = Address.objects.filter(user=request.user, address_type="other").first()
+
+    # Get all addresses for this user
+    all_addresses = Address.objects.filter(user=request.user).order_by('id')
+
+    home_address    = all_addresses.filter(address_type="home").first()
+    office_address  = all_addresses.filter(address_type="office").first()
+    other_address   = all_addresses.filter(address_type="other").first()
 
     selected_type = request.session.get("selected_address_type", "home")
 
@@ -321,16 +323,22 @@ def payment_page(request):
     else:
         selected_address = other_address
 
+    # ✅ Fallback: pick ANY address if none matched by type
+    if not selected_address:
+        selected_address = all_addresses.first()
+
     context = {
-    "items": items,
-    "total": total,
-    "home_address": home_address,
-    "office_address": office_address,
-    "other_address": other_address,
-    "selected_address": selected_address
-}
+        "items": items,
+        "total": total,
+        "home_address": home_address,
+        "office_address": office_address,
+        "other_address": other_address,
+        "selected_address": selected_address
+    }
 
     return render(request, "payment.html", context)
+
+
 
 @login_required(login_url='login')
 def update_address(request):
@@ -404,6 +412,8 @@ def place_order(request):
         "order": order
     })
 
+
+@login_required(login_url='login')
 def my_orders(request):
 
     orders = Order.objects.filter(user=request.user).order_by("-created_at")
@@ -422,15 +432,14 @@ def logout_view(request):
 def profile_dashboard(request):
 
     user = request.user
-    address = Address.objects.filter(user=user).first()
+    address = Address.objects.filter(user=user).order_by('id').first()
+    password = None  # ✅ initialize here so it's always defined
 
     if request.method == "POST":
-
         full_name = request.POST.get("full_name")
         email = request.POST.get("email")
         phone = request.POST.get("phone")
-        password = request.POST.get("password")
-
+        password = request.POST.get("password")  # overwrites on POST
         address_line = request.POST.get("address_line")
         street = request.POST.get("street")
         city = request.POST.get("city")
@@ -439,14 +448,13 @@ def profile_dashboard(request):
 
         name_parts = full_name.split(" ")
         user.first_name = name_parts[0]
-
         if len(name_parts) > 1:
             user.last_name = name_parts[1]
-
         user.email = email
 
         if password:
             user.set_password(password)
+            update_session_auth_hash(request, user)
 
         user.save()
 
@@ -459,8 +467,12 @@ def profile_dashboard(request):
             address.city = city
             address.landmark = landmark
             address.zip_code = zip_code
+            # ✅ Set address_type to "home" if it was never set
+            if not address.address_type:
+                address.address_type = "home"
             address.save()
 
+            request.session['selected_address_type'] = address.address_type
         else:
             Address.objects.create(
                 user=user,
@@ -477,12 +489,20 @@ def profile_dashboard(request):
 
         messages.success(request, "Profile updated successfully!")
 
+        if request.session.get('cart'):
+            return redirect("payment_page")
         return redirect("profile_dashboard")
 
     return render(request, "profile_dashboard.html", {
         "user": user,
         "address": address
     })
+
+    return render(request, "profile_dashboard.html", {
+        "user": user,
+        "address": address
+    })
+    
 
 
 @login_required

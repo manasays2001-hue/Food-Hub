@@ -2,104 +2,571 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>About Me</title>
-
-  <!-- Bootstrap -->
-  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Me — Manasa Srikanth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #f5f0e8;
+      --ink: #1a1612;
+      --warm: #8b6f47;
+      --accent: #c9a96e;
+      --soft: #e8e0d0;
+      --muted: #6b5f52;
+    }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      background-color: #ffffff;
-    }
-
-    .about-section {
-      padding: 80px 150px;
-      background-color: #f8f9fa;
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--cream);
+      color: var(--ink);
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
     }
 
-    .about-title {
+    /* ── Noise texture overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 3rem;
+      background: rgba(245, 240, 232, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(139, 111, 71, 0.15);
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
       font-weight: 700;
-      font-size: 40px;
-      margin-bottom: 20px;
-      text-align: center;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: 0.02em;
     }
 
-    p {
-      font-size: 17px;
-      color: #555;
-      text-align: center;
-      max-width: 800px;
-      margin: auto;
+    .nav-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--warm);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.25s, color 0.25s;
+    }
+    .nav-home:hover { border-color: var(--accent); color: var(--ink); }
+    .nav-home svg { width: 14px; height: 14px; }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      position: relative;
+      z-index: 1;
+      padding-top: 80px;
     }
 
-    .skills-container {
-      max-width: 800px;
-      margin: 30px auto;
+    /* ── Hero ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 88vh;
+      align-items: center;
     }
 
-    .skill-box {
+    .hero-text {
+      padding: 6rem 4rem 6rem 6rem;
+      animation: fadeUp 0.9s ease both;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--warm);
+      border: 1px solid var(--accent);
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.8rem;
+    }
+
+    .hero-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 700;
+      line-height: 1.05;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+    .hero-name span { color: var(--warm); }
+
+    .hero-title {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 2rem;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.8rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.25s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-dark { background: var(--ink); color: var(--cream); }
+    .btn-dark:hover { background: var(--warm); }
+    .btn-outline { border: 1.5px solid var(--warm); color: var(--warm); background: transparent; }
+    .btn-outline:hover { background: var(--warm); color: var(--cream); }
+
+    .hero-visual {
+      height: 88vh;
+      background: var(--soft);
+      position: relative;
+      overflow: hidden;
+      animation: fadeIn 1.2s ease both;
+    }
+
+    .hero-visual::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--warm) 50%, var(--ink) 100%);
+      opacity: 0.12;
+    }
+
+    /* Decorative initials */
+    .hero-monogram {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(8rem, 18vw, 18rem);
+      font-weight: 700;
+      color: var(--accent);
+      opacity: 0.18;
+      letter-spacing: -0.05em;
+      user-select: none;
+    }
+
+    .hero-card {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
       background: white;
-      padding: 12px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-bottom: 10px;
-      text-align: center;
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 20px 60px rgba(26,22,18,0.15);
+      min-width: 280px;
+      animation: slideUp 1s 0.4s ease both;
     }
 
-    .btn-container {
-      text-align: center;
-      margin-top: 30px;
+    .hero-card-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .hero-card-role {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .hero-card-dots {
+      display: flex;
+      gap: 0.4rem;
+      margin-top: 1rem;
+    }
+    .hero-card-dots span {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--soft);
+    }
+    .hero-card-dots span:first-child { background: var(--accent); }
+    .hero-card-dots span:nth-child(2) { background: var(--warm); }
+
+    /* ── Section common ── */
+    section {
+      position: relative;
+      z-index: 1;
     }
 
-    .btn-custom {
-      margin: 5px;
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 6rem 2rem;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--warm);
+      margin-bottom: 0.8rem;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 3rem;
+      line-height: 1.1;
+    }
+
+    /* ── Skills ── */
+    .skills-section { background: white; }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .skill-card {
+      border: 1.5px solid var(--soft);
+      border-radius: 12px;
+      padding: 1.6rem 1.4rem;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--warm), var(--accent));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .skill-card:hover { border-color: var(--accent); box-shadow: 0 8px 30px rgba(201,169,110,0.15); }
+    .skill-card:hover::before { transform: scaleX(1); }
+
+    .skill-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+    .skill-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .skill-desc { font-size: 0.82rem; color: var(--muted); margin-top: 0.3rem; line-height: 1.5; }
+
+    /* ── Contact ── */
+    .contact-section { background: var(--cream); }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .contact-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2.5rem;
+      border: 1.5px solid var(--soft);
+      transition: all 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+    .contact-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 12px 40px rgba(201,169,110,0.18);
+      transform: translateY(-3px);
+    }
+
+    .contact-icon {
+      width: 52px; height: 52px;
+      background: var(--soft);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    .contact-card:hover .contact-icon { background: var(--accent); }
+
+    .contact-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+    .contact-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .contact-cta {
+      font-size: 0.78rem;
+      color: var(--warm);
+      margin-top: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── GitHub CTA ── */
+    .cta-section {
+      background: var(--ink);
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+    .cta-section .section-label { color: var(--accent); }
+    .cta-section .section-title { color: var(--cream); margin-bottom: 1.5rem; }
+    .cta-section p { color: rgba(245,240,232,0.6); margin-bottom: 2.5rem; font-size: 1rem; }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--ink);
+      border-top: 1px solid rgba(201,169,110,0.2);
+      padding: 2.5rem 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--cream);
+    }
+
+    .footer-copy {
+      font-size: 0.78rem;
+      color: rgba(245,240,232,0.4);
+      letter-spacing: 0.05em;
+    }
+
+    .footer-link {
+      font-size: 0.78rem;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .footer-link:hover { border-color: var(--accent); }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .hero-text { padding: 4rem 1.5rem 3rem; }
+      nav { padding: 1rem 1.5rem; }
+      .contact-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+      .section-inner { padding: 4rem 1.5rem; }
     }
   </style>
 </head>
-
 <body>
 
-<div class="container-fluid about-section">
-
-  <h2 class="about-title">About Me</h2>
-
-  <p>
-    Hi, I'm <strong>Manasa Srikanth</strong>, a passionate Python Full Stack Developer.
-    I enjoy building web applications and continuously learning new technologies.
-  </p>
-
-  <p class="mt-3">
-    I currently work in Revenue Cycle Management while developing my skills in
-    Django, frontend technologies, and real-time projects.
-  </p>
-
-  <!-- SKILLS -->
-  <div class="skills-container">
-    <h4 class="mt-4 text-center">Skills</h4>
-
-    <div class="skill-box">HTML & CSS</div>
-    <div class="skill-box">Bootstrap</div>
-    <div class="skill-box">Python</div>
-    <div class="skill-box">Django</div>
-  </div>
-
-  <!-- BUTTONS -->
-  <div class="btn-container">
-    <a href="https://github.com/your-username" target="_blank" class="btn btn-dark btn-custom">
-      GitHub
+  <!-- Navigation -->
+  <nav>
+    <a href="{% url 'index' %}" class="nav-logo">MS</a>
+    <a href="{% url 'index' %}" class="nav-home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      Back to Home
     </a>
+  </nav>
 
-    <a href="mailto:manasays2001@gmail.com" class="btn btn-primary btn-custom">
-      Contact Me
-    </a>
-  </div>
+  <main>
 
-</div>
+    <!-- ── Hero ── -->
+    <div class="hero">
+      <div class="hero-text">
+        <span class="hero-tag">About Me</span>
+        <h1 class="hero-name">Manasa<br><span>Srikanth</span></h1>
+        <p class="hero-title">Python Full Stack Developer </p>
+        <p class="hero-desc">
+          I'm a passionate developer who enjoys building thoughtful web applications.
+          Currently working in Revenue Cycle Management while continuously sharpening
+          my skills in Django, frontend technologies, and real-time projects.
+        </p>
+        <div class="hero-actions">
+          
+          <a href="https://github.com/manasays2001-hue" target="_blank" class="btn btn-outline">GitHub →</a>
+        </div>
+      </div>
 
-<!-- Bootstrap JS -->
-<script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+      <div class="hero-visual">
+        <div class="hero-monogram">MS</div>
+        <div class="hero-card">
+          <p class="hero-card-label">Current Role</p>
+          <p class="hero-card-role">Full Stack Developer intern</p>
+          <div class="hero-card-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Skills ── -->
+    <section class="skills-section">
+      <div class="section-inner">
+        <p class="section-label">What I work with</p>
+        <h2 class="section-title">Skills & Technologies</h2>
+        <div class="skills-grid">
+          <div class="skill-card">
+            <div class="skill-icon">🎨</div>
+            <div class="skill-name">HTML & CSS</div>
+            <div class="skill-desc">Semantic markup, responsive layouts, modern CSS</div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-icon">⚡</div>
+            <div class="skill-name">Bootstrap</div>
+            <div class="skill-desc">Rapid UI prototyping with utility-first components</div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-icon">🐍</div>
+            <div class="skill-name">Python</div>
+            <div class="skill-desc">Scripting, automation, data handling, backend logic</div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-icon">🌐</div>
+            <div class="skill-name">Django</div>
+            <div class="skill-desc">Full-stack web apps, ORM, REST APIs, sessions</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Contact ── -->
+    <section class="contact-section" id="contact">
+      <div class="section-inner">
+        <p class="section-label">Reach out</p>
+        <h2 class="section-title">Contact Information</h2>
+
+        <div class="contact-grid">
+
+          <!-- Email -->
+          <a href="mailto:manasays2001@gmail.com" class="contact-card">
+            <div class="contact-icon">📧</div>
+            <div>
+              <p class="contact-label">Email Address</p>
+              <p class="contact-value">manasays2001@gmail.com</p>
+              <p class="contact-cta">Click to send an email →</p>
+            </div>
+          </a>
+
+          <!-- Phone -->
+          <a href="tel:+917676314610" class="contact-card">
+            <div class="contact-icon">📞</div>
+            <div>
+              <p class="contact-label">Phone Number</p>
+              <p class="contact-value">+91 76763 14610</p>
+              <p class="contact-cta">Click to call →</p>
+            </div>
+          </a>
+
+          <!-- LinkedIn (optional) -->
+          <a href="https://linkedin.com/in/manasasrikanthh" target="_blank" class="contact-card">
+            <div class="contact-icon">💼</div>
+            <div>
+              <p class="contact-label">LinkedIn</p>
+              <p class="contact-value">Manasa Srikanth</p>
+              <p class="contact-cta">View profile →</p>
+            </div>
+          </a>
+
+         
+        </div>
+      </div>
+    </section>
+
+    <!-- ── GitHub CTA ── -->
+    <section class="cta-section">
+      <p class="section-label">Open Source</p>
+      <h2 class="section-title">See my work on GitHub</h2>
+      <p>Explore my projects, contributions, and code repositories.</p>
+      <a href="https://github.com/manasays2001-hue" target="_blank" class="btn btn-outline" style="border-color:var(--accent);color:var(--accent);">
+        Visit GitHub →
+      </a>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <span class="footer-logo">Manasa Srikanth</span>
+    <span class="footer-copy">© 2024 · All rights reserved</span>
+    <a href="{% url 'index' %}" class="footer-link">← Home</a>
+  </footer>
 
 </body>
 </html>

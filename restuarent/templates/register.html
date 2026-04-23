@@ -154,9 +154,9 @@ background:#fafafa;
 
     <li>
         <a class="dropdown-item d-flex align-items-center"
-           href="{% url 'register' %}">
-            <i class="fa fa-user me-2 text-success"></i>
-            Edit Profile
+   href="{% url 'profile_dashboard' %}">
+            <i class="fa fa-user me-2"></i>
+            Profile
         </a>
     </li>
 
@@ -263,9 +263,14 @@ background:#fafafa;
 </div>
 
     <div class="col-md-6 mb-3">
-        <label class="form-label">Street</label>
-        <input type="text" name="street" class="form-control">
-    </div>
+    <label class="form-label">Address Line</label>
+    <input type="text" name="address_line" class="form-control">
+</div>
+
+<div class="col-md-6 mb-3">
+    <label class="form-label">Street</label>
+    <input type="text" name="street" class="form-control">
+</div>
 
     <div class="col-md-6 mb-3">
         <label class="form-label">City</label>

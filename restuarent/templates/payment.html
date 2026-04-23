@@ -222,211 +222,39 @@ padding-bottom:160px;
 </p>
 
 <!-- CHANGE ADDRESS -->
-<div class="dropdown mb-2">
-
-<button class="btn btn-outline-success btn-sm dropdown-toggle"
-type="button"
-data-bs-toggle="dropdown">
-
-Change Address
-
-</button>
-
-<ul class="dropdown-menu">
-
-<li>
-<a class="dropdown-item"
-data-bs-toggle="collapse"
-href="#homeAddress">
-🏠 Home
+<a href="{% url 'profile_dashboard' %}" class="btn btn-outline-success btn-sm mt-1">
+   Change Address
 </a>
-</li>
-
-<li>
-<a class="dropdown-item"
-data-bs-toggle="collapse"
-href="#officeAddress">
-🏢 Office
-</a>
-</li>
-
-<li>
-<a class="dropdown-item"
-data-bs-toggle="collapse"
-href="#otherAddress">
-📍 Other
-</a>
-</li>
-
-</ul>
-
-</div>
-
-<!-- HOME CARD -->
-<div class="collapse mb-2" id="homeAddress">
-
-<form method="POST" action="{% url 'update_address' %}">
-{% csrf_token %}
-
-<div class="card p-3 shadow-sm">
-
-<h6 class="fw-bold">Update Address</h6>
-<input type="hidden" name="address_type" value="home">
-<input type="number" name="phone" class="form-control mb-2"
-placeholder="phone number"
-value="{{ home_address.phone }}">
-
-<input type="text" name="address_line" class="form-control mb-2"
-placeholder="Address Line"
-value="{{ home_address.address_line }}">
-
-<input type="text" name="street" class="form-control mb-2"
-placeholder="Street"
-value="{{ home_address.street }}">
-
-<input type="text" name="city" class="form-control mb-2"
-placeholder="City"
-value="{{ home_address.city }}">
-
-<input type="text" name="landmark" class="form-control mb-2"
-placeholder="Landmark"
-value="{{ home_address.landmark }}">
-
-<input type="text" name="zip_code" class="form-control mb-2"
-placeholder="Zip Code"
-value="{{ home_address.zip_code }}">
-
-<button class="btn btn-success btn-sm">
-Update Address
-</button>
-
-</div>
-
-</form>
-
-</div>
-
-
-<!-- OFFICE CARD -->
-<div class="collapse mb-2" id="officeAddress">
-
-<form method="POST" action="{% url 'update_address' %}">
-{% csrf_token %}
-
-<div class="card p-3 shadow-sm">
-
-<h6 class="fw-bold">Update Address</h6>
-<input type="hidden" name="address_type" value="office">
-<input type="number" name="phone" class="form-control mb-2"
-placeholder="phone number"
-value="{{ office_address.phone }}">
-
-<input type="text" name="address_line" class="form-control mb-2"
-placeholder="Address Line"
-value="{{ office_address.address_line }}">
-
-<input type="text" name="street" class="form-control mb-2"
-placeholder="Street"
-value="{{ office_address.street }}">
-
-<input type="text" name="city" class="form-control mb-2"
-placeholder="City"
-value="{{ office_address.city }}">
-
-<input type="text" name="landmark" class="form-control mb-2"
-placeholder="Landmark"
-value="{{ office_address.landmark }}">
-
-<input type="text" name="zip_code" class="form-control mb-2"
-placeholder="Zip Code"
-value="{{ office_address.zip_code }}">
-
-<button class="btn btn-success btn-sm">
-Update Address
-</button>
-
-</div>
-
-</form>
-
-</div>
-
-
-<!-- OTHER CARD -->
-<div class="collapse mb-2" id="otherAddress">
-
-<form method="POST" action="{% url 'update_address' %}">
-{% csrf_token %}
-
-<div class="card p-3 shadow-sm">
-
-<h6 class="fw-bold">Update Address</h6>
-<input type="hidden" name="address_type" value="other">
-<input type="number" name="phone" class="form-control mb-2"
-placeholder="phone number"
-value="{{ other_address.phone }}">
-
-<input type="text" name="address_line" class="form-control mb-2"
-placeholder="Address Line"
-value="{{ other_address.address_line }}">
-
-<input type="text" name="street" class="form-control mb-2"
-placeholder="Street"
-value="{{ other_address.street }}">
-
-<input type="text" name="city" class="form-control mb-2"
-placeholder="City"
-value="{{ other_address.city }}">
-
-<input type="text" name="landmark" class="form-control mb-2"
-placeholder="Landmark"
-value="{{ other_address.landmark }}">
-
-<input type="text" name="zip_code" class="form-control mb-2"
-placeholder="Zip Code"
-value="{{ other_address.zip_code }}">
-
-<button class="btn btn-success btn-sm">
-Update Address
-</button>
-
-</div>
-
-</form>
-
-</div>
 
 {% else %}
-
-<p class="text-danger">No address found</p>
-
+<p class="text-danger small">No address found. Please add one.</p>
+<a href="{% url 'profile_dashboard' %}" class="btn btn-outline-danger btn-sm mt-1">
+  + Add Address
+</a>
 {% endif %}
 
 </div>
 
-
 <!-- TOTAL + ORDER BUTTON -->
 <div class="d-flex align-items-center gap-3 p-3">
 
-<div class="text-end">
+  <div class="text-end">
+    <small class="text-muted">TOTAL</small><br>
+    <span class="fs-5 fw-bold text-success">₹{{ total }}</span>
+  </div>
 
-<small class="text-muted">TOTAL</small><br>
-<span class="fs-5 fw-bold text-success">₹{{ total }}</span>
-
-</div>
-
-<form method="POST" action="{% url 'place_order' %}">
-{% csrf_token %}
-
-<input type="hidden" name="total" value="{{ total }}">
-
-<button class="btn btn-success rounded-pill px-4">
-Place Order
-</button>
-
-</form>
+  <form method="POST" action="{% url 'place_order' %}">
+    {% csrf_token %}
+    <input type="hidden" name="total" value="{{ total }}">
+    <button class="btn btn-success rounded-pill px-4">Place Order</button>
+  </form>
 
 </div>
+
+</div>
+</div>
+
+
 
 </div>
 
