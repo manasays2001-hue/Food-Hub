@@ -7,6 +7,8 @@ from .models import Entry,Address,Order,OrderItem,admin
 from django.db.models import Sum,FloatField
 import uuid,random,string
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.core.mail import send_mail
+
 
 def entry(request):
 
@@ -211,7 +213,7 @@ def register(request):
         phone = request.POST.get("phone")
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
-        address_type = request.POST.get("address_type", "home")  # ✅ add this
+        address_type = request.POST.get("address_type", "home")  
 
         if password != confirm_password:
             messages.error(request, "Passwords do not match")
@@ -254,13 +256,21 @@ def login_view(request):
 
         user = authenticate(request, username=username, password=password)
 
+        if not user:
+            try:
+                user_obj = User.objects.get(email=username)
+                user = authenticate(request, username=user_obj.username, password=password)
+            except User.DoesNotExist:
+                user = None
+
         if user:
-            login(request, user)   
+            login(request, user)
             return redirect('index')
         else:
             messages.error(request, "Invalid login details")
 
     return render(request, "login.html")
+
 
 def admin_login(request):
     if request.method == "POST":
@@ -288,9 +298,7 @@ def admin_logout(request):
 
 @login_required(login_url='login')
 def payment_page(request):
-
     cart = request.session.get('cart', {})
-
     if not cart:
         return redirect('checkout')
 
@@ -307,25 +315,17 @@ def payment_page(request):
             'subtotal': subtotal
         })
 
-    # Get all addresses for this user
-    all_addresses = Address.objects.filter(user=request.user).order_by('id')
-
-    home_address    = all_addresses.filter(address_type="home").first()
-    office_address  = all_addresses.filter(address_type="office").first()
-    other_address   = all_addresses.filter(address_type="other").first()
-
     selected_type = request.session.get("selected_address_type", "home")
+    selected_address = Address.objects.filter(
+        user=request.user, address_type=selected_type
+    ).first()
 
-    if selected_type == "home":
-        selected_address = home_address
-    elif selected_type == "office":
-        selected_address = office_address
-    else:
-        selected_address = other_address
-
-    # ✅ Fallback: pick ANY address if none matched by type
     if not selected_address:
-        selected_address = all_addresses.first()
+        selected_address = Address.objects.filter(user=request.user).order_by('id').first()
+
+    home_address   = Address.objects.filter(user=request.user, address_type="home").first()
+    office_address = Address.objects.filter(user=request.user, address_type="office").first()
+    other_address  = Address.objects.filter(user=request.user, address_type="other").first()
 
     context = {
         "items": items,
@@ -333,11 +333,9 @@ def payment_page(request):
         "home_address": home_address,
         "office_address": office_address,
         "other_address": other_address,
-        "selected_address": selected_address
+        "selected_address": selected_address,
     }
-
     return render(request, "payment.html", context)
-
 
 
 @login_required(login_url='login')
@@ -380,7 +378,6 @@ def place_order(request):
         return redirect('index')
 
     total = 0
-
     order_id = "ORD" + ''.join(random.choices(string.digits, k=6))
 
     order = Order.objects.create(
@@ -388,6 +385,8 @@ def place_order(request):
         order_id=order_id,
         total=0
     )
+
+    order_items_text = ""
 
     for product_id, quantity in cart.items():
         product = Entry.objects.get(product_id=int(product_id))
@@ -401,17 +400,37 @@ def place_order(request):
             price=product.price
         )
 
+        order_items_text += f"{product.name} x{quantity} = ₹{subtotal}\n"
+
     order.total = total
     order.save()
 
     request.session['cart'] = {}
-    order = Order.objects.filter(user=request.user).order_by('-created_at').first()
 
+    user_email = request.user.email
+    user_name  = request.user.first_name or request.user.username
+
+    send_mail(
+        subject=f"Order Confirmed! ID: {order_id}",
+        message=f"Hi {user_name},\n\nYour order has been placed successfully!\n\nOrder ID: {order_id}\n\nItems:\n{order_items_text}\nTotal: ₹{total}\n\nThank you for ordering from FoodieHub!",
+        from_email="manasa.srikath.mails@gmail.com",
+        recipient_list=[user_email],
+        fail_silently=False,
+    )
+
+    send_mail(
+        subject="New Order Received",
+        message=f"New order placed!\n\nOrder ID: {order_id}\nCustomer: {user_name}\nEmail: {user_email}\n\nItems:\n{order_items_text}\nTotal: ₹{total}",
+        from_email="manasa.srikath.mails@gmail.com",
+        recipient_list=["manasa.srikath.mails@gmail.com"],
+        fail_silently=True,
+    )
+
+    order = Order.objects.filter(user=request.user).order_by('-created_at').first()
 
     return render(request, "payment.html", {
         "order": order
     })
-
 
 @login_required(login_url='login')
 def my_orders(request):
@@ -430,51 +449,56 @@ def logout_view(request):
 
 @login_required(login_url='login')
 def profile_dashboard(request):
-
     user = request.user
     address = Address.objects.filter(user=user).order_by('id').first()
-    password = None  # ✅ initialize here so it's always defined
+    password = None
 
     if request.method == "POST":
-        full_name = request.POST.get("full_name")
-        email = request.POST.get("email")
-        phone = request.POST.get("phone")
-        password = request.POST.get("password")  # overwrites on POST
+        full_name    = request.POST.get("full_name")
+        email        = request.POST.get("email")
+        phone        = request.POST.get("phone")
+        password     = request.POST.get("password")
         address_line = request.POST.get("address_line")
-        street = request.POST.get("street")
-        city = request.POST.get("city")
-        landmark = request.POST.get("landmark")
-        zip_code = request.POST.get("zip_code")
+        street       = request.POST.get("street")
+        city         = request.POST.get("city")
+        landmark     = request.POST.get("landmark")
+        zip_code     = request.POST.get("zip_code")
+        address_type = request.POST.get("address_type", "home")
 
-        name_parts = full_name.split(" ")
+        saved_cart = request.session.get('cart', {})
+
+        if User.objects.filter(username=email).exclude(pk=user.pk).exists():
+            messages.error(request, "This email is already registered by another user.")
+            return redirect("profile_dashboard")
+
+        name_parts = full_name.split(" ", 1)
         user.first_name = name_parts[0]
-        if len(name_parts) > 1:
-            user.last_name = name_parts[1]
-        user.email = email
+        user.last_name  = name_parts[1] if len(name_parts) > 1 else ""
+        user.email    = email
+        user.username = email
 
         if password:
             user.set_password(password)
-            update_session_auth_hash(request, user)
 
         user.save()
 
-        if address:
-            address.full_name = full_name
-            address.email = email
-            address.phone = phone
-            address.address_line = address_line
-            address.street = street
-            address.city = city
-            address.landmark = landmark
-            address.zip_code = zip_code
-            # ✅ Set address_type to "home" if it was never set
-            if not address.address_type:
-                address.address_type = "home"
-            address.save()
+        update_session_auth_hash(request, user)
+        request.session['cart'] = saved_cart
+        request.session['selected_address_type'] = address_type
 
-            request.session['selected_address_type'] = address.address_type
+        if address:
+            address.full_name    = full_name
+            address.email        = email
+            address.phone        = phone
+            address.address_line = address_line
+            address.street       = street
+            address.city         = city
+            address.landmark     = landmark
+            address.zip_code     = zip_code
+            address.address_type = address_type
+            address.save()
         else:
-            Address.objects.create(
+            address = Address.objects.create(
                 user=user,
                 full_name=full_name,
                 email=email,
@@ -484,26 +508,20 @@ def profile_dashboard(request):
                 street=street,
                 city=city,
                 landmark=landmark,
-                zip_code=zip_code
+                zip_code=zip_code,
+                address_type=address_type,
             )
 
         messages.success(request, "Profile updated successfully!")
 
-        if request.session.get('cart'):
+        if saved_cart:
             return redirect("payment_page")
         return redirect("profile_dashboard")
 
     return render(request, "profile_dashboard.html", {
         "user": user,
-        "address": address
+        "address": address,
     })
-
-    return render(request, "profile_dashboard.html", {
-        "user": user,
-        "address": address
-    })
-    
-
 
 @login_required
 def order_details(request, order_id):

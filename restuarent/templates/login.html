@@ -13,12 +13,20 @@
             <div class="card p-4">
                 <h4 class="text-center mb-3">Login</h4>
 
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
                 <form method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ next }}">
 
-                    <input type="text" name="username" class="form-control mb-3" placeholder="Username">
-                    <input type="password" name="password" class="form-control mb-3" placeholder="Password"> 
+                    <input type="email" name="username" class="form-control mb-3" placeholder="Enter your Email">
+                    <input type="password" name="password" class="form-control mb-3" placeholder="Password">
 
                     <button class="btn btn-primary w-100">Login</button>
                 </form>
